@@ -1,25 +1,3 @@
-# GCDL Backend Setup
-
-## Installation
-
-1. Navigate to the backend folder:
-   ```
-   cd backend
-   ```
-
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Update `.env` with your MySQL credentials:
-   ```
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=your_password
-   DB_NAME=gcdl_db
-   JWT_SECRET=your_secret_key
-   ```
 
 4. Initialize the database:
    ```
