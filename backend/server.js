@@ -38,8 +38,8 @@ sequelize
   .authenticate()
   .then(() => {
     console.log('Database connection established');
-    // Avoid destructive changes; models match existing schema
-    return sequelize.sync({ alter: false });
+    // Use alter:true to sync models and update tables without data loss
+    return sequelize.sync({ alter: true });
   })
   .then(() => {
     app.listen(PORT, () => {

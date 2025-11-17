@@ -5,7 +5,12 @@ const { User, Branch } = require('../models');
 // CEO signup (first-time only, no existing CEO needed)
 const ceoSignup = async (req, res) => {
   try {
-    const { email, password, full_name, phone } = req.body;
+    const { email, password, confirm_password, full_name, phone } = req.body;
+
+    // Confirm password match
+    if (password !== confirm_password) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
 
     // Check if CEO already exists
     const ceo = await User.findOne({ where: { role: 'CEO' } });
@@ -32,7 +37,12 @@ const ceoSignup = async (req, res) => {
 // CEO creates Manager
 const createManager = async (req, res) => {
   try {
-    const { email, password, full_name, phone, branch_id } = req.body;
+    const { email, password, confirm_password, full_name, phone, branch_id } = req.body;
+
+    // Confirm password match
+    if (password !== confirm_password) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
 
     // Only CEO can create managers
     if (req.user.role !== 'CEO') {
@@ -68,7 +78,12 @@ const createManager = async (req, res) => {
 // Manager creates Sales Agent
 const createSalesAgent = async (req, res) => {
   try {
-    const { email, password, full_name, phone, branch_id } = req.body;
+    const { email, password, confirm_password, full_name, phone, branch_id } = req.body;
+
+    // Confirm password match
+    if (password !== confirm_password) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
 
     // Only Manager can create sales agents (for their branch)
     if (req.user.role !== 'Manager') {

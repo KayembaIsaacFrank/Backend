@@ -7,9 +7,13 @@ const User = sequelize.define('User', {
     autoIncrement: true,
     primaryKey: true,
   },
-  name: {
+  full_name: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
   email: {
     type: DataTypes.STRING,
@@ -24,10 +28,10 @@ const User = sequelize.define('User', {
     allowNull: false,
   },
   role: {
-    type: DataTypes.ENUM('CEO', 'Manager', 'SalesAgent', 'Customer'),
+    type: DataTypes.ENUM('CEO', 'Manager', 'Sales Agent', 'Customer'),
     allowNull: false,
   },
-  branchId: {
+  branch_id: {
     type: DataTypes.INTEGER,
     allowNull: true, // CEO may not have a branch
     references: {
@@ -35,9 +39,9 @@ const User = sequelize.define('User', {
       key: 'id',
     },
   },
-  contact: {
-    type: DataTypes.STRING,
-    allowNull: true,
+  is_active: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
   },
 }, {
   timestamps: true,

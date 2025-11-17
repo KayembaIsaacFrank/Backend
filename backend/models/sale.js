@@ -35,11 +35,16 @@ const Sale = sequelize.define('Sale', {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
   },
+  total_amount: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+    defaultValue: 0,
+  },
   amountPaid: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
   },
-  date: {
+  sales_date: {
     type: DataTypes.DATEONLY,
     allowNull: false,
   },

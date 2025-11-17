@@ -11,14 +11,31 @@ const Buyer = sequelize.define('Buyer', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  contact: {
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  location: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  password: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  purchaseHistory: {
-    type: DataTypes.JSON,
-    allowNull: true, // Can be used to store an array of purchase records or references
+  created_by: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
   },
+  // purchaseHistory: {
+  //   type: DataTypes.JSON,
+  //   allowNull: true,
+  // },
 }, {
   timestamps: true,
 });
