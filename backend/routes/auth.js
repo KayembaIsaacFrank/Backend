@@ -6,6 +6,8 @@ const { changePassword } = require('../controllers/changePasswordController');
 
 // Public routes
 router.post('/ceo-signup', authController.ceoSignup);
+router.post('/manager-signup', authController.managerSignup);
+router.post('/agent-signup', authController.agentSignup);
 router.post('/login', authController.login);
 
 // Protected routes

@@ -196,9 +196,79 @@ const login = async (req, res) => {
   }
 };
 
+// Public self-signup for Manager
+const managerSignup = async (req, res) => {
+  try {
+    const { email, password, confirm_password, full_name, phone, branch_id } = req.body;
+    if (password !== confirm_password) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
+    // Only one manager per branch
+    const existingManager = await User.findOne({ where: { branch_id, role: 'Manager' } });
+    if (existingManager) {
+      return res.status(400).json({ error: 'This branch already has a manager' });
+    }
+    // Check if email already exists
+    const existing = await User.findOne({ where: { email } });
+    if (existing) return res.status(400).json({ error: 'Email already exists' });
+    // Check if branch exists
+    const branch = await Branch.findByPk(branch_id);
+    if (!branch) return res.status(400).json({ error: 'Branch does not exist' });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const created = await User.create({
+      email,
+      password: hashedPassword,
+      full_name,
+      phone,
+      role: 'Manager',
+      branch_id,
+    });
+    res.status(201).json({ message: 'Manager created successfully', userId: created.id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Public self-signup for Sales Agent
+const agentSignup = async (req, res) => {
+  try {
+    const { email, password, confirm_password, full_name, phone, branch_id } = req.body;
+    if (password !== confirm_password) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
+    // Enforce a maximum of two sales agents per branch
+    const agentCount = await User.count({ where: { branch_id, role: 'Sales Agent' } });
+    if (agentCount >= 2) {
+      return res.status(400).json({ error: 'This branch already has two sales agents' });
+    }
+    // Check if email already exists
+    const existing = await User.findOne({ where: { email } });
+    if (existing) return res.status(400).json({ error: 'Email already exists' });
+    // Check if branch exists
+    const branch = await Branch.findByPk(branch_id);
+    if (!branch) return res.status(400).json({ error: 'Branch does not exist' });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const created = await User.create({
+      email,
+      password: hashedPassword,
+      full_name,
+      phone,
+      role: 'Sales Agent',
+      branch_id,
+    });
+    res.status(201).json({ message: 'Sales Agent created successfully', userId: created.id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   ceoSignup,
   createManager,
   createSalesAgent,
   login,
+  managerSignup,
+  agentSignup,
 };
