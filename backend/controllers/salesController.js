@@ -10,7 +10,7 @@ const getSales = async (req, res) => {
         { model: Produce, attributes: ['name'] },
         { model: User, as: 'agent', attributes: ['full_name'] },
       ],
-      order: [['sales_date', 'DESC'], ['sales_time', 'DESC']],
+      order: [['sales_date', 'DESC'], ['time', 'DESC']],
     });
     const data = rows.map((r) => ({ ...r.toJSON(), produce_name: r.produce?.name, agent_name: r.agent?.full_name }));
     res.json({ data });

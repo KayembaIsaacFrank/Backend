@@ -21,7 +21,7 @@ router.get('/', authenticateToken, async (req, res) => {
         { model: Buyer, attributes: ['name'] },
         { model: User, as: 'agent', attributes: ['full_name'] },
       ],
-      order: [['sales_date', 'DESC']],
+      order: [['date', 'DESC']],
     });
     const data = rows.map(r => ({
       ...r.toJSON(),

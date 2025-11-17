@@ -7,7 +7,7 @@ const getProcurements = async (req, res) => {
     const rows = await Procurement.findAll({
       where,
       include: [{ model: Produce, attributes: ['name'] }],
-      order: [['procurement_date', 'DESC'], ['procurement_time', 'DESC']],
+      order: [['date', 'DESC'], ['time', 'DESC']],
     });
     const data = rows.map((r) => ({ ...r.toJSON(), produce_name: r.produce?.name }));
     res.json({ data });

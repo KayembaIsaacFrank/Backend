@@ -10,36 +10,37 @@ const Stock = require('./stock');
 const Buyer = require('./buyer');
 
 // Associations
-User.belongsTo(Branch, { foreignKey: 'branchId' });
-Branch.hasMany(User, { foreignKey: 'branchId' });
 
-Branch.hasMany(Procurement, { foreignKey: 'branchId' });
-Procurement.belongsTo(Branch, { foreignKey: 'branchId' });
-Procurement.belongsTo(Produce, { foreignKey: 'produceId' });
-Produce.hasMany(Procurement, { foreignKey: 'produceId' });
+User.belongsTo(Branch, { foreignKey: 'branch_id' });
+Branch.hasMany(User, { foreignKey: 'branch_id' });
 
-Stock.belongsTo(Branch, { foreignKey: 'branchId' });
-Stock.belongsTo(Produce, { foreignKey: 'produceId' });
-Branch.hasMany(Stock, { foreignKey: 'branchId' });
-Produce.hasMany(Stock, { foreignKey: 'produceId' });
+Branch.hasMany(Procurement, { foreignKey: 'branch_id' });
+Procurement.belongsTo(Branch, { foreignKey: 'branch_id' });
+Procurement.belongsTo(Produce, { foreignKey: 'produce_id' });
+Produce.hasMany(Procurement, { foreignKey: 'produce_id' });
 
-Sale.belongsTo(Branch, { foreignKey: 'branchId' });
-Sale.belongsTo(Produce, { foreignKey: 'produceId' });
-Sale.belongsTo(Buyer, { foreignKey: 'buyerId' });
-Sale.belongsTo(User, { foreignKey: 'salesAgentId', as: 'agent' });
-Branch.hasMany(Sale, { foreignKey: 'branchId' });
-Produce.hasMany(Sale, { foreignKey: 'produceId' });
-Buyer.hasMany(Sale, { foreignKey: 'buyerId' });
-User.hasMany(Sale, { foreignKey: 'salesAgentId', as: 'salesAsAgent' });
+Stock.belongsTo(Branch, { foreignKey: 'branch_id' });
+Stock.belongsTo(Produce, { foreignKey: 'produce_id' });
+Branch.hasMany(Stock, { foreignKey: 'branch_id' });
+Produce.hasMany(Stock, { foreignKey: 'produce_id' });
 
-CreditSale.belongsTo(Branch, { foreignKey: 'branchId' });
-CreditSale.belongsTo(Buyer, { foreignKey: 'buyerId' });
-CreditSale.belongsTo(Produce, { foreignKey: 'produceId' });
-CreditSale.belongsTo(User, { foreignKey: 'salesAgentId', as: 'agent' });
-Branch.hasMany(CreditSale, { foreignKey: 'branchId' });
-Buyer.hasMany(CreditSale, { foreignKey: 'buyerId' });
-Produce.hasMany(CreditSale, { foreignKey: 'produceId' });
-User.hasMany(CreditSale, { foreignKey: 'salesAgentId', as: 'creditSalesAsAgent' });
+Sale.belongsTo(Branch, { foreignKey: 'branch_id' });
+Sale.belongsTo(Produce, { foreignKey: 'produce_id' });
+Sale.belongsTo(Buyer, { foreignKey: 'buyer_id' });
+Sale.belongsTo(User, { foreignKey: 'sales_agent_id', as: 'agent' });
+Branch.hasMany(Sale, { foreignKey: 'branch_id' });
+Produce.hasMany(Sale, { foreignKey: 'produce_id' });
+Buyer.hasMany(Sale, { foreignKey: 'buyer_id' });
+User.hasMany(Sale, { foreignKey: 'sales_agent_id', as: 'salesAsAgent' });
+
+CreditSale.belongsTo(Branch, { foreignKey: 'branch_id' });
+CreditSale.belongsTo(Buyer, { foreignKey: 'buyer_id' });
+CreditSale.belongsTo(Produce, { foreignKey: 'produce_id' });
+CreditSale.belongsTo(User, { foreignKey: 'sales_agent_id', as: 'agent' });
+Branch.hasMany(CreditSale, { foreignKey: 'branch_id' });
+Buyer.hasMany(CreditSale, { foreignKey: 'buyer_id' });
+Produce.hasMany(CreditSale, { foreignKey: 'produce_id' });
+User.hasMany(CreditSale, { foreignKey: 'sales_agent_id', as: 'creditSalesAsAgent' });
 
 // Export all models and sequelize
 module.exports = {

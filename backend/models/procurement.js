@@ -9,7 +9,7 @@ const Procurement = sequelize.define('Procurement', {
   },
   produceId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'Produces',
       key: 'id',

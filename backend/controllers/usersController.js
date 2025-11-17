@@ -1,3 +1,19 @@
+// Manager: Permanently remove a sales agent by user ID (only for their branch)
+const deleteSalesAgent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Only allow deleting sales agents for the manager's branch
+    const user = await User.findOne({ where: { id, role: 'Sales Agent' } });
+    if (!user) return res.status(404).json({ error: 'Sales Agent not found' });
+    if (req.user.role !== 'Manager' || req.user.branch_id !== user.branch_id) {
+      return res.status(403).json({ error: 'Not authorized to remove this sales agent' });
+    }
+    await user.destroy();
+    res.json({ message: 'Sales Agent permanently removed from the database' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to remove sales agent' });
+  }
+};
 const { User, Branch } = require('../models');
 
 const listManagers = async (req, res) => {
@@ -43,8 +59,24 @@ const listAgentsByBranch = async (req, res) => {
   }
 };
 
+// CEO: Permanently remove a manager by user ID
+const deleteManager = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Only allow deleting managers
+    const user = await User.findOne({ where: { id, role: 'Manager' } });
+    if (!user) return res.status(404).json({ error: 'Manager not found' });
+    await user.destroy();
+    res.json({ message: 'Manager permanently removed from the database' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to remove manager' });
+  }
+};
+
 module.exports = {
   listManagers,
   listAgents,
   listAgentsByBranch,
+  deleteManager,
+  deleteSalesAgent,
 };

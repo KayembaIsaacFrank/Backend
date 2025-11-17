@@ -12,4 +12,12 @@ router.get('/agents', authenticateToken, authorizeRole('CEO'), listAgents);
 // CEO/Manager: list agents by branch (manager limited to own branch)
 router.get('/agents/branch/:branchId', authenticateToken, authorizeRole('CEO', 'Manager'), authorizeBranch, listAgentsByBranch);
 
+// CEO: remove (deactivate) a manager by user ID
+const { deleteManager } = require('../controllers/usersController');
+router.delete('/managers/:id', authenticateToken, authorizeRole('CEO'), deleteManager);
+
+// Manager: remove (deactivate) a sales agent by user ID (only for their branch)
+const { deleteSalesAgent } = require('../controllers/usersController');
+router.delete('/agents/:id', authenticateToken, authorizeRole('Manager'), deleteSalesAgent);
+
 module.exports = router;

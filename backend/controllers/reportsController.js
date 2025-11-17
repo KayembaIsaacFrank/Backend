@@ -190,18 +190,19 @@ const exportSalesCsv = async (req, res) => {
     }
     const whereSql = where.length ? 'WHERE ' + where.join(' AND ') : '';
 
-    const sql = `SELECT s.id, s.sales_date, s.sales_time, b.name as branch_name, p.name as produce_name, s.tonnage, s.price_per_ton, s.total_amount, u.full_name as agent_name, s.buyer_name, s.buyer_phone
+      const sql = `SELECT s.id, s.sales_date, s.time, b.name as branch_name, p.name as produce_name, s.tonnage, (s.total_amount / s.tonnage) AS price_per_ton, s.total_amount, u.full_name as agent_name, buyer.name as buyer_name, buyer.phone as buyer_phone
       FROM sales s
       JOIN branches b ON s.branch_id = b.id
       JOIN produce p ON s.produce_id = p.id
       JOIN users u ON s.sales_agent_id = u.id
+      LEFT JOIN buyers buyer ON s.buyer_id = buyer.id
       ${whereSql}
-      ORDER BY s.sales_date DESC, s.sales_time DESC`;
+      ORDER BY s.sales_date DESC, s.time DESC`;
 
     const [rows] = await sequelize.query(sql, { replacements: params });
 
     // Build CSV
-    const headers = ['id', 'sales_date', 'sales_time', 'branch_name', 'produce_name', 'tonnage', 'price_per_ton', 'total_amount', 'agent_name', 'buyer_name', 'buyer_phone'];
+      const headers = ['id', 'sales_date', 'time', 'branch_name', 'produce_name', 'tonnage', 'price_per_ton', 'total_amount', 'agent_name', 'buyer_name', 'buyer_phone'];
     const csvLines = [headers.join(',')];
     for (const r of rows) {
       const line = headers.map((h) => {
@@ -236,13 +237,14 @@ const exportSalesXlsx = async (req, res) => {
     if (agent_id) { where.push('s.sales_agent_id = ?'); params.push(agent_id); }
     const whereSql = where.length ? 'WHERE ' + where.join(' AND ') : '';
 
-    const sql = `SELECT s.id, s.sales_date, s.sales_time, b.name as branch_name, p.name as produce_name, s.tonnage, s.price_per_ton, s.total_amount, u.full_name as agent_name, s.buyer_name, s.buyer_phone
+      const sql = `SELECT s.id, s.sales_date, s.time, b.name as branch_name, p.name as produce_name, s.tonnage, (s.total_amount / s.tonnage) AS price_per_ton, s.total_amount, u.full_name as agent_name, buyer.name as buyer_name, buyer.phone as buyer_phone
       FROM sales s
       JOIN branches b ON s.branch_id = b.id
       JOIN produce p ON s.produce_id = p.id
       JOIN users u ON s.sales_agent_id = u.id
+      LEFT JOIN buyers buyer ON s.buyer_id = buyer.id
       ${whereSql}
-      ORDER BY s.sales_date DESC, s.sales_time DESC`;
+      ORDER BY s.sales_date DESC, s.time DESC`;
 
     const [rows] = await sequelize.query(sql, { replacements: params });
 
@@ -251,7 +253,7 @@ const exportSalesXlsx = async (req, res) => {
     const headers = [
       { header: 'ID', key: 'id', width: 10 },
       { header: 'Date', key: 'sales_date', width: 12 },
-      { header: 'Time', key: 'sales_time', width: 10 },
+      { header: 'Time', key: 'time', width: 10 },
       { header: 'Branch', key: 'branch_name', width: 20 },
       { header: 'Produce', key: 'produce_name', width: 18 },
       { header: 'Tonnage', key: 'tonnage', width: 12 },
@@ -295,13 +297,14 @@ const exportSalesPdf = async (req, res) => {
     if (agent_id) { where.push('s.sales_agent_id = ?'); params.push(agent_id); }
     const whereSql = where.length ? 'WHERE ' + where.join(' AND ') : '';
 
-    const sql = `SELECT s.id, s.sales_date, s.sales_time, b.name as branch_name, p.name as produce_name, s.tonnage, s.price_per_ton, s.total_amount, u.full_name as agent_name, s.buyer_name, s.buyer_phone
+      const sql = `SELECT s.id, s.sales_date, s.time, b.name as branch_name, p.name as produce_name, s.tonnage, (s.total_amount / s.tonnage) AS price_per_ton, s.total_amount, u.full_name as agent_name, buyer.name as buyer_name, buyer.phone as buyer_phone
       FROM sales s
       JOIN branches b ON s.branch_id = b.id
       JOIN produce p ON s.produce_id = p.id
       JOIN users u ON s.sales_agent_id = u.id
+      LEFT JOIN buyers buyer ON s.buyer_id = buyer.id
       ${whereSql}
-      ORDER BY s.sales_date DESC, s.sales_time DESC`;
+      ORDER BY s.sales_date DESC, s.time DESC`;
 
     const [rows] = await sequelize.query(sql, { replacements: params });
 
@@ -324,8 +327,8 @@ const exportSalesPdf = async (req, res) => {
     doc.moveDown(1);
 
     // Table header
-    const headers = ['Date', 'Branch', 'Produce', 'Tonnage', 'Price/Ton', 'Total', 'Buyer'];
-    const colWidths = [70, 80, 80, 60, 70, 70, 90];
+    const headers = ['Date', 'Branch', 'Produce', 'Tonnage', 'Price/Ton', 'Total', 'Buyer', 'Buyer Phone'];
+    const colWidths = [70, 80, 80, 60, 70, 70, 90, 90];
     const startX = doc.page.margins.left;
     let y = doc.y;
 
@@ -358,6 +361,7 @@ const exportSalesPdf = async (req, res) => {
         Number(r.price_per_ton).toLocaleString(),
         Number(r.total_amount).toLocaleString(),
         r.buyer_name || '-',
+        r.buyer_phone || '-',
       ]);
     });
 
