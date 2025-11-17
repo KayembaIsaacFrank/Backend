@@ -16,8 +16,8 @@ router.get('/agents/branch/:branchId', authenticateToken, authorizeRole('CEO', '
 const { deleteManager } = require('../controllers/usersController');
 router.delete('/managers/:id', authenticateToken, authorizeRole('CEO'), deleteManager);
 
-// Manager: remove (deactivate) a sales agent by user ID (only for their branch)
+// CEO/Manager: remove (deactivate) a sales agent by user ID (manager limited to their branch)
 const { deleteSalesAgent } = require('../controllers/usersController');
-router.delete('/agents/:id', authenticateToken, authorizeRole('Manager'), deleteSalesAgent);
+router.delete('/agents/:id', authenticateToken, authorizeRole('CEO', 'Manager'), deleteSalesAgent);
 
 module.exports = router;

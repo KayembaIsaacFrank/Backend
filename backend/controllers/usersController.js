@@ -1,11 +1,12 @@
-// Manager: Permanently remove a sales agent by user ID (only for their branch)
+// CEO/Manager: Permanently remove a sales agent by user ID (manager limited to their branch)
 const deleteSalesAgent = async (req, res) => {
   try {
     const { id } = req.params;
-    // Only allow deleting sales agents for the manager's branch
+    // Only allow deleting sales agents
     const user = await User.findOne({ where: { id, role: 'Sales Agent' } });
     if (!user) return res.status(404).json({ error: 'Sales Agent not found' });
-    if (req.user.role !== 'Manager' || req.user.branch_id !== user.branch_id) {
+    // Manager can only remove agents from their branch, CEO can remove any agent
+    if (req.user.role === 'Manager' && req.user.branch_id !== user.branch_id) {
       return res.status(403).json({ error: 'Not authorized to remove this sales agent' });
     }
     await user.destroy();

@@ -2,6 +2,13 @@ const { Branch } = require('../models');
 
 const listBranches = async (req, res) => {
   try {
+    // If no user (public access for signup), return all branches
+    if (!req.user) {
+      const branches = await Branch.findAll({ order: [['id', 'ASC']] });
+      return res.json(branches);
+    }
+    
+    // Authenticated users: CEO sees all, others see their own
     if (req.user.role === 'CEO') {
       const branches = await Branch.findAll({ order: [['id', 'ASC']] });
       return res.json(branches);

@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken } = require('../middleware/auth');
+const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const { listBranches, getBranchById } = require('../controllers/branchesController');
 
-// Get branches (CEO sees all; others see their own)
-router.get('/', authenticateToken, listBranches);
+// Get branches - PUBLIC for signup, authenticated users get filtered results
+router.get('/', optionalAuth, listBranches);
 
 // Get branch by ID (secured inside controller)
 router.get('/:id', authenticateToken, getBranchById);

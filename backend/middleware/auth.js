@@ -17,6 +17,26 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+// Optional authentication - sets user if token exists, but doesn't reject if missing
+const optionalAuth = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    req.user = null;
+    return next();
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      req.user = null;
+    } else {
+      req.user = user;
+    }
+    next();
+  });
+};
+
 const authorizeRole = (...allowedRoles) => {
   return (req, res, next) => {
     if (!allowedRoles.includes(req.user.role)) {
@@ -39,6 +59,7 @@ const authorizeBranch = (req, res, next) => {
 
 module.exports = {
   authenticateToken,
+  optionalAuth,
   authorizeRole,
   authorizeBranch,
 };
