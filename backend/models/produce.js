@@ -8,11 +8,11 @@ const Produce = sequelize.define('Produce', {
     primaryKey: true,
   },
   name: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM('beans', 'grain maize', 'cowpeas', 'groundnuts', 'rice', 'soybeans'),
     allowNull: false,
   },
   type: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM('beans', 'grain maize', 'cowpeas', 'groundnuts', 'rice', 'soybeans'),
     allowNull: false,
   },
   sellingPrice: {

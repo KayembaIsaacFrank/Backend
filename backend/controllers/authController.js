@@ -50,18 +50,11 @@ const createManager = async (req, res) => {
     }
 
 
+
     // Enforce only one manager per branch
-    console.log('Attempting to create manager for branch_id:', branch_id, 'role: Manager');
     const existingManager = await User.findOne({ where: { branch_id, role: 'Manager' } });
     if (existingManager) {
-      console.log('Branch already has a manager:', existingManager.id);
       return res.status(400).json({ error: 'This branch already has a manager' });
-    }
-
-    // Check if there are already two managers in total
-    const managerCount = await User.count({ where: { role: 'Manager' } });
-    if (managerCount >= 2) {
-      return res.status(400).json({ error: 'Maximum number of managers (2) reached' });
     }
 
     // Check if email already exists
@@ -93,12 +86,7 @@ const createManager = async (req, res) => {
 // Manager creates Sales Agent
 const createSalesAgent = async (req, res) => {
   try {
-    const { email, password, confirm_password, full_name, phone, branch_id } = req.body;
-
-    // Confirm password match
-    if (password !== confirm_password) {
-      return res.status(400).json({ error: 'Passwords do not match' });
-    }
+    const { email, password, full_name, phone, branch_id } = req.body;
 
     // Only Manager can create sales agents (for their branch)
     if (req.user.role !== 'Manager') {
@@ -109,15 +97,12 @@ const createSalesAgent = async (req, res) => {
       return res.status(403).json({ error: 'Can only create agents for your branch' });
     }
 
-    // Check if there are already two sales agents in total
-    const agentCount = await User.count({ where: { role: 'Sales Agent' } });
-    if (agentCount >= 2) {
-      return res.status(400).json({ error: 'Maximum number of sales agents (2) reached' });
-    }
 
-    // Check if branch already has a sales agent
-    const existingAgent = await User.findOne({ where: { branch_id, role: 'Sales Agent' } });
-    if (existingAgent) return res.status(400).json({ error: 'This branch already has a sales agent' });
+    // Enforce a maximum of two sales agents per branch
+    const agentCount = await User.count({ where: { branch_id, role: 'Sales Agent' } });
+    if (agentCount >= 2) {
+      return res.status(400).json({ error: 'This branch already has two sales agents' });
+    }
 
     // Check if email already exists
     const existing = await User.findOne({ where: { email } });

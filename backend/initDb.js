@@ -204,51 +204,122 @@ const initializeDatabase = async () => {
     console.log('All tables created successfully');
 
     // Insert default produce types
-    const produce = [
-      'Beans',
-      'Grain Maize',
-      'Cowpeas',
-      'Groundnuts',
-      'Rice',
-      'Soybeans',
-    ];
 
-    for (const prod of produce) {
-      try {
-        await dbConn.execute('INSERT INTO produce (name) VALUES (?)', [prod]);
-      } catch (error) {
-        // Ignore duplicate entries
+    const { Produce } = require('./models');
+
+    async function initProduce() {
+      // Define default produce with required fields: name, type, sellingPrice
+      const defaultProduce = [
+        { name: 'maize', type: 'cereal', sellingPrice: 0 },
+        { name: 'beans', type: 'legume', sellingPrice: 0 },
+        { name: 'rice', type: 'cereal', sellingPrice: 0 },
+        { name: 'cassava', type: 'root', sellingPrice: 0 },
+        { name: 'sorghum', type: 'cereal', sellingPrice: 0 },
+        { name: 'millet', type: 'cereal', sellingPrice: 0 },
+        { name: 'groundnuts', type: 'legume', sellingPrice: 0 },
+        { name: 'soybeans', type: 'legume', sellingPrice: 0 },
+        { name: 'sunflower', type: 'oilseed', sellingPrice: 0 },
+        { name: 'sesame', type: 'oilseed', sellingPrice: 0 },
+        { name: 'cowpeas', type: 'legume', sellingPrice: 0 },
+        { name: 'pigeonpeas', type: 'legume', sellingPrice: 0 },
+        { name: 'green grams', type: 'legume', sellingPrice: 0 },
+        { name: 'sweet potatoes', type: 'root', sellingPrice: 0 },
+        { name: 'irish potatoes', type: 'root', sellingPrice: 0 },
+        { name: 'wheat', type: 'cereal', sellingPrice: 0 },
+        { name: 'barley', type: 'cereal', sellingPrice: 0 },
+        { name: 'oats', type: 'cereal', sellingPrice: 0 },
+        { name: 'simsim', type: 'oilseed', sellingPrice: 0 },
+        { name: 'peas', type: 'legume', sellingPrice: 0 },
+        { name: 'lentils', type: 'legume', sellingPrice: 0 },
+        { name: 'sugarcane', type: 'other', sellingPrice: 0 },
+        { name: 'cotton', type: 'other', sellingPrice: 0 },
+        { name: 'coffee', type: 'other', sellingPrice: 0 },
+        { name: 'tea', type: 'other', sellingPrice: 0 },
+        { name: 'tobacco', type: 'other', sellingPrice: 0 },
+        { name: 'bananas', type: 'fruit', sellingPrice: 0 },
+        { name: 'matooke', type: 'fruit', sellingPrice: 0 },
+        { name: 'pineapples', type: 'fruit', sellingPrice: 0 },
+        { name: 'mangoes', type: 'fruit', sellingPrice: 0 },
+        { name: 'oranges', type: 'fruit', sellingPrice: 0 },
+        { name: 'lemons', type: 'fruit', sellingPrice: 0 },
+        { name: 'avocado', type: 'fruit', sellingPrice: 0 },
+        { name: 'passion fruits', type: 'fruit', sellingPrice: 0 },
+        { name: 'tomatoes', type: 'vegetable', sellingPrice: 0 },
+        { name: 'onions', type: 'vegetable', sellingPrice: 0 },
+        { name: 'cabbages', type: 'vegetable', sellingPrice: 0 },
+        { name: 'carrots', type: 'vegetable', sellingPrice: 0 },
+        { name: 'eggplants', type: 'vegetable', sellingPrice: 0 },
+        { name: 'okra', type: 'vegetable', sellingPrice: 0 },
+        { name: 'pumpkins', type: 'vegetable', sellingPrice: 0 },
+        { name: 'watermelons', type: 'fruit', sellingPrice: 0 },
+        { name: 'cucumbers', type: 'vegetable', sellingPrice: 0 },
+        { name: 'greens', type: 'vegetable', sellingPrice: 0 },
+        { name: 'amaranth', type: 'vegetable', sellingPrice: 0 },
+        { name: 'sukuma wiki', type: 'vegetable', sellingPrice: 0 },
+        { name: 'spinach', type: 'vegetable', sellingPrice: 0 },
+        { name: 'dodo', type: 'vegetable', sellingPrice: 0 },
+        { name: 'nakati', type: 'vegetable', sellingPrice: 0 },
+        { name: 'bitter berries', type: 'vegetable', sellingPrice: 0 },
+        { name: 'nsuga', type: 'vegetable', sellingPrice: 0 },
+        { name: 'entula', type: 'vegetable', sellingPrice: 0 },
+        { name: 'other', type: 'other', sellingPrice: 0 },
+      ];
+
+      for (const produce of defaultProduce) {
+        await Produce.findOrCreate({
+          where: { name: produce.name },
+          defaults: {
+            type: produce.type,
+            sellingPrice: produce.sellingPrice,
+          }
+        });
       }
+      console.log('Default produce types initialized.');
     }
 
-    console.log('Default produce types inserted');
 
-    // Insert default branches
-    const branches = [
-      { name: 'Maganjo Branch', location: 'Maganjo' },
-      { name: 'Matugga Branch', location: 'Matugga' },
-    ];
-
-    for (const branch of branches) {
-      try {
-        await dbConn.execute('INSERT INTO branches (name, location) VALUES (?, ?)', [
-          branch.name,
-          branch.location,
-        ]);
-      } catch (error) {
-        // Ignore duplicate entries
-      }
-    }
-
-    console.log('Default branches inserted');
-
-    await dbConn.end();
-    console.log('Database initialization completed successfully');
-  } catch (error) {
-    console.error('Error initializing database:', error);
+    // Return dbConn for further use
+    return dbConn;
+  } catch (err) {
+    console.error('Error initializing database:', err);
     process.exit(1);
   }
 };
 
-// Run the initialization
-initializeDatabase();
+// Insert default produce types using Sequelize model
+const { Produce } = require('./models');
+
+async function initProduce() {
+  // Define default produce with required fields: name, type, sellingPrice
+  const defaultProduce = [
+    { name: 'beans', type: 'beans', sellingPrice: 0 },
+    { name: 'grain maize', type: 'grain maize', sellingPrice: 0 },
+    { name: 'cowpeas', type: 'cowpeas', sellingPrice: 0 },
+    { name: 'groundnuts', type: 'groundnuts', sellingPrice: 0 },
+    { name: 'rice', type: 'rice', sellingPrice: 0 },
+    { name: 'soybeans', type: 'soybeans', sellingPrice: 0 },
+  ];
+
+  for (const produce of defaultProduce) {
+    await Produce.findOrCreate({
+      where: { name: produce.name },
+      defaults: {
+        type: produce.type,
+        sellingPrice: produce.sellingPrice,
+      }
+    });
+  }
+  console.log('Default produce types initialized.');
+}
+
+// Main execution
+initializeDatabase()
+  .then(() => initProduce())
+  .then(() => {
+    console.log('Database initialization complete.');
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.error('Error initializing database:', err);
+    process.exit(1);
+  });

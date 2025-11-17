@@ -2,8 +2,24 @@ const { Sale, Produce, User, Stock, Buyer, sequelize } = require('../models');
 
 const getSales = async (req, res) => {
   try {
-    const { branch_id } = req.query;
-    const where = branch_id ? { branch_id } : undefined;
+    let where = {};
+    // CEO: see all sales
+    if (req.user.role === 'CEO') {
+      // no filter
+    } else if (req.user.role === 'Manager') {
+      // Manager: only sales for their branch
+      if (!req.user.branch_id) return res.status(403).json({ error: 'Manager branch not set' });
+      where.branch_id = req.user.branch_id;
+    } else if (req.user.role === 'Sales Agent') {
+      // Sales Agent: only their own sales
+      where.sales_agent_id = req.user.id;
+    } else {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    // Optional branch filter for CEO
+    if (req.user.role === 'CEO' && req.query.branch_id) {
+      where.branch_id = req.query.branch_id;
+    }
     const rows = await Sale.findAll({
       where,
       include: [

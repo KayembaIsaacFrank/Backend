@@ -32,8 +32,30 @@ const createProcurement = async (req, res) => {
       procurement_time,
     } = req.body;
 
+
     if (!branch_id || !produce_id || !tonnage || !cost_per_ton || !selling_price_per_ton) {
       return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Enforce allowed produce types
+    const allowedProduce = ['beans', 'grain maize', 'cowpeas', 'groundnuts', 'rice', 'soybeans'];
+    const produce = await Produce.findByPk(produce_id);
+    if (!produce || !allowedProduce.includes(produce.name)) {
+      return res.status(400).json({ error: 'Produce type not allowed' });
+    }
+
+    // Enforce minimum 1 ton
+    if (parseFloat(tonnage) < 1) {
+      return res.status(400).json({ error: 'Minimum procurement is 1 ton' });
+    }
+
+    // Enforce allowed sources
+    // Acceptable sources: individual dealer, company, Maganjo farm, Matugga farm
+    const allowedSources = ['individual', 'company', 'maganjo', 'matugga'];
+    const source = (dealer_name || '').toLowerCase();
+    const isAllowedSource = allowedSources.some(s => source.includes(s));
+    if (!isAllowedSource) {
+      return res.status(400).json({ error: 'Source must be individual, company, Maganjo, or Matugga' });
     }
 
     const total_cost = parseFloat(tonnage) * parseFloat(cost_per_ton);
