@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-// Sanitize DB name to handle quotes/backticks in .env (e.g., "golden crop")
+
 const dbName = (process.env.DB_NAME || '').replace(/[`"']/g, '');
 
 const sequelize = new Sequelize(

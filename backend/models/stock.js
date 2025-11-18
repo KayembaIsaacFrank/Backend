@@ -7,33 +7,36 @@ const Stock = sequelize.define('Stock', {
     autoIncrement: true,
     primaryKey: true,
   },
-  produceId: {
+  produce_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    field: 'produce_id',
     references: {
-      model: 'Produces',
+      model: 'produce',
       key: 'id',
     },
   },
-  branchId: {
+  branch_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    field: 'branch_id',
     references: {
-      model: 'Branches',
+      model: 'branches',
       key: 'id',
     },
   },
-  quantity: {
+  current_tonnage: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
-  },
-  lastUpdated: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW,
+    field: 'current_tonnage',
+    defaultValue: 0.00,
   },
 }, {
+  tableName: 'stock',
   timestamps: true,
+  underscored: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
 });
 
 module.exports = Stock;
