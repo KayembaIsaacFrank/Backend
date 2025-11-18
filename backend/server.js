@@ -52,22 +52,26 @@ sequelize
   });
 
 
-// Enforce unique manager per branch at DB level (run once, safe if already exists)
-sequelize.query("ALTER TABLE users ADD UNIQUE unique_manager_per_branch (branch_id, role)").catch((err) => {
-  if (err.original && err.original.code === 'ER_DUP_KEYNAME') {
-    // Index already exists, ignore
-    console.log('Unique index unique_manager_per_branch already exists.');
-  } else if (err.original && err.original.code === 'ER_DUP_ENTRY') {
-    console.error('Duplicate manager per branch exists! Please resolve manually:', err.message);
-  } else if (err.original && err.original.code === 'ER_DUP_KEY') {
-    console.error('Duplicate key error:', err.message);
-  } else if (err.original && err.original.code === 'ER_ALREADY_EXISTS') {
-    // Index already exists, ignore
-    console.log('Unique index unique_manager_per_branch already exists.');
-  } else {
-    console.error('Error adding unique_manager_per_branch index:', err.message);
+// Remove the old incorrect unique constraint that prevented multiple sales agents per branch
+// First, we need to find and drop the constraint properly
+sequelize.query(`
+  SELECT CONSTRAINT_NAME 
+  FROM information_schema.TABLE_CONSTRAINTS 
+  WHERE TABLE_NAME = 'users' 
+  AND TABLE_SCHEMA = DATABASE()
+  AND CONSTRAINT_NAME = 'unique_manager_per_branch'
+`).then(([results]) => {
+  if (results.length > 0) {
+    // Constraint exists, drop it
+    return sequelize.query("ALTER TABLE users DROP INDEX unique_manager_per_branch");
   }
+}).catch((err) => {
+  // Ignore errors - index might not exist or already removed
+  console.log('Unique constraint cleanup:', err.original ? err.original.code : 'processed');
 });
+
+// Note: One manager per branch is now enforced in application logic only (authController)
+// This allows 2 sales agents per branch while preventing duplicate managers
 
 app.get('/api/sales', (req, res) => {
   sequelize.query('SELECT * FROM sales ORDER BY date DESC', { order: [['date', 'DESC']] })
